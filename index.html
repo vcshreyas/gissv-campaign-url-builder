@@ -1,0 +1,920 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GISSV Campaign URL Builder</title>
+  <style>
+:root {
+  --bg: #eeeeee;
+  --text: #202124;
+  --muted: #5f6368;
+  --line: #c6c6c6;
+  --field: #f5f5f5;
+  --accent: #f9ab00;
+  --accent-dark: #e37400;
+  --panel: #ffffff;
+  --blue: #1a73e8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 54px;
+  padding: 0 24px;
+  background: var(--bg);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.analytics-mark {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-dark);
+}
+
+.analytics-mark::before,
+.analytics-mark::after {
+  content: "";
+  position: absolute;
+  background: var(--bg);
+}
+
+.analytics-mark::before {
+  left: 8px;
+  top: 4px;
+  width: 6px;
+  height: 14px;
+}
+
+.analytics-mark::after {
+  left: 4px;
+  top: 8px;
+  width: 14px;
+  height: 6px;
+}
+
+.divider {
+  width: 1px;
+  height: 25px;
+  background: #777;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.header-actions button {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  font-size: 0;
+}
+
+.header-actions button::before {
+  position: absolute;
+  content: "";
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.header-actions button:first-child::before {
+  width: 16px;
+  height: 16px;
+  border: 3px dotted #5f6368;
+  border-radius: 50%;
+}
+
+.header-actions button:last-child::before {
+  top: 37%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #5f6368;
+}
+
+.header-actions button:last-child::after {
+  position: absolute;
+  content: "";
+  left: 50%;
+  bottom: 7px;
+  width: 18px;
+  height: 9px;
+  transform: translateX(-50%);
+  border-radius: 10px 10px 3px 3px;
+  background: #5f6368;
+}
+
+.page {
+  display: grid;
+  grid-template-columns: minmax(420px, 760px) minmax(320px, 430px);
+  align-items: start;
+  gap: 34px;
+  width: min(1180px, 100%);
+  padding: 0 24px 46px;
+}
+
+.builder-area {
+  min-width: 0;
+}
+
+.kicker {
+  margin: 8px 0 6px;
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0 0 26px;
+  font-size: clamp(34px, 4.6vw, 52px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  border-bottom: 1px solid transparent;
+}
+
+.tab {
+  min-width: 84px;
+  height: 44px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab.active {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.intro {
+  max-width: 720px;
+  margin: 0 0 18px;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.audit-card {
+  max-width: 720px;
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border: 1px solid #ead7ad;
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  background: #fffaf0;
+}
+
+.audit-card h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.audit-card code {
+  display: block;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #ead7ad;
+  border-radius: 3px;
+  background: #fff;
+  color: #7a4b00;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.audit-card ul {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding-left: 18px;
+}
+
+.audit-card li,
+.audit-card p {
+  color: #4a4030;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.audit-card p {
+  margin: 0;
+}
+
+.coverage-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 720px;
+  margin: 0 0 24px;
+}
+
+.coverage-strip span {
+  min-height: 38px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  background: #fff;
+  color: #3c4043;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.tab-note {
+  padding: 12px 14px;
+  border-left: 4px solid var(--accent);
+  background: #fff8e1;
+}
+
+h2 {
+  margin: 0 0 14px;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.helper {
+  margin: 0 0 20px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.utm-form {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  max-width: 600px;
+}
+
+.field span {
+  display: block;
+  width: auto;
+  margin-left: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--field);
+  color: var(--text);
+  font-size: 16px;
+}
+
+.field input:focus,
+.field select:focus,
+.output-card textarea:focus {
+  border-color: var(--blue);
+  outline: 2px solid rgba(26, 115, 232, 0.18);
+}
+
+.field small {
+  padding-left: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.output-panel {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 16px;
+  padding-top: 86px;
+}
+
+.output-card,
+.summary-card {
+  border: 1px solid #d5d5d5;
+  border-radius: 4px;
+  background: var(--panel);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.12);
+}
+
+.output-card {
+  padding: 18px;
+}
+
+.output-card h2,
+.summary-card h2 {
+  margin: 0 0 14px;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.output-card h2 {
+  color: var(--accent-dark);
+}
+
+.output-card textarea {
+  display: block;
+  width: 100%;
+  min-height: 158px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: #fafafa;
+  color: var(--text);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.primary-button,
+.plain-button {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.primary-button {
+  border: 1px solid var(--accent-dark);
+  background: var(--accent-dark);
+  color: #fff;
+}
+
+.plain-button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+}
+
+.summary-card {
+  padding: 16px 18px;
+}
+
+.summary-card p,
+.summary-card li,
+.summary-card dd {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.summary-card p {
+  margin: 0 0 10px;
+}
+
+.summary-card p:last-child {
+  margin-bottom: 0;
+}
+
+.summary-card dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.summary-card dl div {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.summary-card dt {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.summary-card dd {
+  margin: 0;
+}
+
+.summary-card ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.examples-section {
+  grid-column: 1 / -1;
+  max-width: 1180px;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.examples-section h2 {
+  margin-bottom: 6px;
+}
+
+.section-copy {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.example-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.example-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #d5d5d5;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.12);
+}
+
+.example-card h3 {
+  margin: 0 0 10px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.example-card code {
+  display: block;
+  min-height: 136px;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  background: #fafafa;
+  color: #174ea6;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+@media (max-width: 1040px) {
+  .page {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 18px 36px;
+  }
+
+  .output-panel {
+    position: static;
+    padding-top: 0;
+    max-width: 760px;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-header {
+    padding: 0 14px;
+  }
+
+  .header-brand {
+    gap: 8px;
+    font-size: 16px;
+  }
+
+  .header-brand strong {
+    max-width: 170px;
+  }
+
+  .divider,
+  .header-brand span:last-child {
+    display: none;
+  }
+
+  .page {
+    padding: 0 14px 32px;
+  }
+
+  h1 {
+    margin-bottom: 22px;
+    font-size: 38px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  .field,
+  .output-panel {
+    max-width: none;
+  }
+
+  .summary-card dl div {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .coverage-strip,
+  .example-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+</style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="analytics-mark" aria-hidden="true"></span>
+      <strong>Google Analytics</strong>
+      <span class="divider"></span>
+      <span>Demos & Tools</span>
+    </div>
+    <div class="header-actions" aria-label="Toolbar">
+      <button type="button" aria-label="Settings">âš™</button>
+      <button type="button" aria-label="Account">â—</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="builder-area" aria-labelledby="page-title">
+      <p class="kicker">GISSV Spring Enrollment Campaign</p>
+      <h1 id="page-title">Campaign URL Builder & GA4 Tracking Taxonomy</h1>
+
+      <div class="tabs" aria-label="Builder type">
+        <button class="tab active" type="button" aria-current="page">WEB</button>
+      </div>
+
+      <p class="intro">
+        This tool adds campaign parameters to GISSV enrollment URLs so traffic from Meta Ads, Google Search,
+        the community newsletter, and school-fair QR banners can be measured in GA4.
+      </p>
+
+      <section class="audit-card" aria-labelledby="audit-title">
+        <h2 id="audit-title">Provided link audit</h2>
+        <code>https://www.gissv.org/gissv-home-english?utm_source=newsletter%2C+google%2C+Meta&amp;utm_medium=banners%2C+email&amp;utm_campaign=springenrollment2026</code>
+        <ul>
+          <li>It combines multiple sources in one value: newsletter, google, Meta.</li>
+          <li>It combines multiple mediums in one value: banners, email.</li>
+          <li>It uses inconsistent casing and spacing, which can split GA4 reports.</li>
+          <li>It is missing utm_content, so creative, placement, and QR location cannot be compared.</li>
+        </ul>
+        <p><strong>Correction:</strong> create one clean URL per channel using controlled lowercase values.</p>
+      </section>
+
+      <div class="coverage-strip" aria-label="Task deliverables covered">
+        <span>1. UTM naming convention</span>
+        <span>2. Three tagged URL examples</span>
+        <span>3. GA4 conversion event</span>
+        <span>4. Pitfalls and prevention</span>
+      </div>
+
+      <h2>Enter the website URL and campaign information</h2>
+      <p class="helper">Fill out the required fields marked with an asterisk (*), and the campaign URL will be generated for you.</p>
+
+      <form class="utm-form" id="utm-form">
+        <label class="field">
+          <span>Website URL *</span>
+          <input id="website-url" name="website-url" type="url" value="https://www.gissv.org/gissv-home-english" required>
+          <small>The full website URL where campaign traffic should land.</small>
+        </label>
+
+        <label class="field">
+          <span>Channel example *</span>
+          <select id="channel-preset" name="channel-preset">
+            <option value="meta">Meta ad - open house carousel</option>
+            <option value="google">Google Search - bilingual school query</option>
+            <option value="newsletter">Community newsletter - body link</option>
+            <option value="banner">School fair QR banner</option>
+          </select>
+          <small>Select a channel to populate the source, medium, and content values.</small>
+        </label>
+
+        <label class="field">
+          <span>Campaign ID</span>
+          <input id="campaign-id" name="campaign-id" type="text" placeholder="optional">
+          <small>The ads campaign ID, if available.</small>
+        </label>
+
+        <label class="field">
+          <span>Campaign source *</span>
+          <select id="campaign-source" name="campaign-source" required>
+            <option value="meta">meta</option>
+            <option value="google">google</option>
+            <option value="community_newsletter">community_newsletter</option>
+            <option value="school_fair">school_fair</option>
+          </select>
+          <small>The referrer or publisher, such as google, meta, newsletter, or school_fair.</small>
+        </label>
+
+        <label class="field">
+          <span>Campaign medium *</span>
+          <select id="campaign-medium" name="campaign-medium" required>
+            <option value="paid_social">paid_social</option>
+            <option value="paid_search">paid_search</option>
+            <option value="newsletter">newsletter</option>
+            <option value="offline_qr">offline_qr</option>
+          </select>
+          <small>The marketing medium, such as paid_social, paid_search, newsletter, or offline_qr.</small>
+        </label>
+
+        <label class="field">
+          <span>Campaign name *</span>
+          <input id="campaign-name" name="campaign-name" type="text" value="spring_enrollment_2026" required>
+          <small>Use one shared name across all channels.</small>
+        </label>
+
+        <label class="field">
+          <span>Campaign term</span>
+          <input id="campaign-term" name="campaign-term" type="text" placeholder="optional paid keyword">
+          <small>Identify paid search keywords only when needed.</small>
+        </label>
+
+        <label class="field">
+          <span>Campaign content *</span>
+          <input id="campaign-content" name="campaign-content" type="text" required>
+          <small>Differentiate creative, audience, link placement, QR location, and version.</small>
+        </label>
+      </form>
+    </section>
+
+    <aside class="output-panel" aria-label="Generated result and tracking summary">
+      <section class="output-card">
+        <h2>Generated campaign URL</h2>
+        <textarea id="generated-url" readonly aria-label="Generated campaign URL"></textarea>
+        <div class="button-row">
+          <button class="primary-button" id="copy-url" type="button">Copy URL</button>
+          <button class="plain-button" id="reset-builder" type="button">Reset</button>
+        </div>
+      </section>
+
+      <section class="summary-card">
+        <h2>UTM taxonomy</h2>
+        <dl>
+          <div>
+            <dt>utm_source</dt>
+            <dd>Who sent the traffic.</dd>
+          </div>
+          <div>
+            <dt>utm_medium</dt>
+            <dd>How the traffic was delivered.</dd>
+          </div>
+          <div>
+            <dt>utm_campaign</dt>
+            <dd>spring_enrollment_2026</dd>
+          </div>
+          <div>
+            <dt>utm_content</dt>
+            <dd>Creative, placement, and version.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="summary-card">
+        <h2>GA4 conversion event</h2>
+        <p><strong>generate_lead</strong> should be marked as the primary conversion when a family submits an inquiry form, books a tour, or registers for an open house.</p>
+        <p class="muted">Micro-events: view_admissions_page, start_inquiry_form, click_email_or_phone.</p>
+      </section>
+
+      <section class="summary-card">
+        <h2>Common pitfalls</h2>
+        <ul>
+          <li>Do not mix source and medium values.</li>
+          <li>Do not use spaces, uppercase text, or commas.</li>
+          <li>Do not add UTMs to internal website links.</li>
+          <li>Use a unique content value for each QR banner.</li>
+        </ul>
+      </section>
+    </aside>
+
+    <section class="examples-section" aria-labelledby="examples-title">
+      <h2 id="examples-title">Required URL examples</h2>
+      <p class="section-copy">These are the three complete tagged URLs requested in the scenario.</p>
+      <div class="example-grid">
+        <article class="example-card">
+          <h3>Facebook / Meta ad</h3>
+          <code id="example-meta"></code>
+        </article>
+        <article class="example-card">
+          <h3>Community newsletter link</h3>
+          <code id="example-newsletter"></code>
+        </article>
+        <article class="example-card">
+          <h3>Physical QR banner</h3>
+          <code id="example-banner"></code>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+const form = document.querySelector("#utm-form");
+const websiteUrl = document.querySelector("#website-url");
+const channelPreset = document.querySelector("#channel-preset");
+const campaignId = document.querySelector("#campaign-id");
+const source = document.querySelector("#campaign-source");
+const medium = document.querySelector("#campaign-medium");
+const campaignName = document.querySelector("#campaign-name");
+const term = document.querySelector("#campaign-term");
+const content = document.querySelector("#campaign-content");
+const generatedUrl = document.querySelector("#generated-url");
+const copyButton = document.querySelector("#copy-url");
+const resetButton = document.querySelector("#reset-builder");
+const exampleMeta = document.querySelector("#example-meta");
+const exampleNewsletter = document.querySelector("#example-newsletter");
+const exampleBanner = document.querySelector("#example-banner");
+
+const presets = {
+  meta: {
+    source: "meta",
+    medium: "paid_social",
+    content: "fb_parentlookalike_openhouse_carousel_v01",
+    term: "",
+  },
+  google: {
+    source: "google",
+    medium: "paid_search",
+    content: "search_bilingual_school_nonbrand_exact_v01",
+    term: "bilingual_private_school",
+  },
+  newsletter: {
+    source: "community_newsletter",
+    medium: "newsletter",
+    content: "localparentdigest_march_openhouse_body_v01",
+    term: "",
+  },
+  banner: {
+    source: "school_fair",
+    medium: "offline_qr",
+    content: "fair_mv_banner_a_v01",
+    term: "",
+  },
+};
+
+function cleanValue(value) {
+  return value.trim().toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
+}
+
+function buildUrl() {
+  const base = websiteUrl.value.trim();
+  if (!base) {
+    generatedUrl.value = "";
+    return;
+  }
+
+  const params = new URLSearchParams();
+  if (campaignId.value.trim()) {
+    params.set("utm_id", cleanValue(campaignId.value));
+  }
+  params.set("utm_source", cleanValue(source.value));
+  params.set("utm_medium", cleanValue(medium.value));
+  params.set("utm_campaign", cleanValue(campaignName.value));
+  if (term.value.trim()) {
+    params.set("utm_term", cleanValue(term.value));
+  }
+  params.set("utm_content", cleanValue(content.value));
+
+  const joiner = base.includes("?") ? "&" : "?";
+  generatedUrl.value = `${base}${joiner}${params.toString()}`;
+}
+
+function buildExampleUrl(presetName) {
+  const preset = presets[presetName];
+  const params = new URLSearchParams({
+    utm_source: preset.source,
+    utm_medium: preset.medium,
+    utm_campaign: cleanValue(campaignName.value || "spring_enrollment_2026"),
+    utm_content: preset.content,
+  });
+
+  if (preset.term) {
+    params.set("utm_term", preset.term);
+  }
+
+  return `${websiteUrl.value.trim()}?${params.toString()}`;
+}
+
+function updateExamples() {
+  if (exampleMeta) {
+    exampleMeta.textContent = buildExampleUrl("meta");
+  }
+  if (exampleNewsletter) {
+    exampleNewsletter.textContent = buildExampleUrl("newsletter");
+  }
+  if (exampleBanner) {
+    exampleBanner.textContent = buildExampleUrl("banner");
+  }
+}
+
+function applyPreset(name) {
+  const preset = presets[name];
+  if (!preset) {
+    return;
+  }
+  source.value = preset.source;
+  medium.value = preset.medium;
+  content.value = preset.content;
+  term.value = preset.term;
+  buildUrl();
+  updateExamples();
+}
+
+channelPreset.addEventListener("change", () => applyPreset(channelPreset.value));
+
+form.addEventListener("input", () => {
+  buildUrl();
+  updateExamples();
+});
+form.addEventListener("change", () => {
+  buildUrl();
+  updateExamples();
+});
+
+copyButton.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(generatedUrl.value);
+    copyButton.textContent = "Copied";
+    setTimeout(() => {
+      copyButton.textContent = "Copy URL";
+    }, 1200);
+  } catch {
+    generatedUrl.select();
+  }
+});
+
+resetButton.addEventListener("click", () => {
+  websiteUrl.value = "https://www.gissv.org/gissv-home-english";
+  campaignId.value = "";
+  campaignName.value = "spring_enrollment_2026";
+  channelPreset.value = "meta";
+  applyPreset("meta");
+});
+
+applyPreset("meta");
+updateExamples();
+
+</script>
+</body>
+</html>
+
