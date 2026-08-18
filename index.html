@@ -612,22 +612,19 @@ h2 {
       </p>
 
       <section class="audit-card" aria-labelledby="audit-title">
-        <h2 id="audit-title">Provided link audit</h2>
-        <code>https://www.gissv.org/gissv-home-english?utm_source=newsletter%2C+google%2C+Meta&amp;utm_medium=banners%2C+email&amp;utm_campaign=springenrollment2026</code>
-        <ul>
-          <li>It combines multiple sources in one value: newsletter, google, Meta.</li>
-          <li>It combines multiple mediums in one value: banners, email.</li>
-          <li>It uses inconsistent casing and spacing, which can split GA4 reports.</li>
-          <li>It is missing utm_content, so creative, placement, and QR location cannot be compared.</li>
-        </ul>
-        <p><strong>Correction:</strong> create one clean URL per channel using controlled lowercase values.</p>
+        <h2 id="audit-title">Manually generated campaign links</h2>
+        <p>
+          Each channel gets its own destination URL so GA4 can report traffic and leads separately for Meta,
+          Google Search, the community newsletter, and school-fair QR banners.
+        </p>
+        <p><strong>Approach:</strong> create one clean URL per channel using controlled lowercase values.</p>
       </section>
 
       <div class="coverage-strip" aria-label="Task deliverables covered">
         <span>1. UTM naming convention</span>
         <span>2. Three tagged URL examples</span>
-        <span>3. GA4 conversion event</span>
-        <span>4. Pitfalls and prevention</span>
+        <span>3. Conversion measurement</span>
+        <span>4. Prevention controls</span>
       </div>
 
       <h2>Enter the website URL and campaign information</h2>
@@ -686,12 +683,6 @@ h2 {
         </label>
 
         <label class="field">
-          <span>Campaign term</span>
-          <input id="campaign-term" name="campaign-term" type="text" placeholder="optional paid keyword">
-          <small>Identify paid search keywords only when needed.</small>
-        </label>
-
-        <label class="field">
           <span>Campaign content *</span>
           <input id="campaign-content" name="campaign-content" type="text" required>
           <small>Differentiate creative, audience, link placement, QR location, and version.</small>
@@ -731,21 +722,6 @@ h2 {
         </dl>
       </section>
 
-      <section class="summary-card">
-        <h2>GA4 conversion event</h2>
-        <p><strong>generate_lead</strong> should be marked as the primary conversion when a family submits an inquiry form, books a tour, or registers for an open house.</p>
-        <p class="muted">Micro-events: view_admissions_page, start_inquiry_form, click_email_or_phone.</p>
-      </section>
-
-      <section class="summary-card">
-        <h2>Common pitfalls</h2>
-        <ul>
-          <li>Do not mix source and medium values.</li>
-          <li>Do not use spaces, uppercase text, or commas.</li>
-          <li>Do not add UTMs to internal website links.</li>
-          <li>Use a unique content value for each QR banner.</li>
-        </ul>
-      </section>
     </aside>
 
     <section class="examples-section" aria-labelledby="examples-title">
@@ -776,7 +752,6 @@ const campaignId = document.querySelector("#campaign-id");
 const source = document.querySelector("#campaign-source");
 const medium = document.querySelector("#campaign-medium");
 const campaignName = document.querySelector("#campaign-name");
-const term = document.querySelector("#campaign-term");
 const content = document.querySelector("#campaign-content");
 const generatedUrl = document.querySelector("#generated-url");
 const copyButton = document.querySelector("#copy-url");
@@ -790,25 +765,21 @@ const presets = {
     source: "meta",
     medium: "paid_social",
     content: "fb_parentlookalike_openhouse_carousel_v01",
-    term: "",
   },
   google: {
     source: "google",
     medium: "paid_search",
     content: "search_bilingual_school_nonbrand_exact_v01",
-    term: "bilingual_private_school",
   },
   newsletter: {
     source: "community_newsletter",
     medium: "newsletter",
     content: "localparentdigest_march_openhouse_body_v01",
-    term: "",
   },
   banner: {
     source: "school_fair",
     medium: "offline_qr",
     content: "fair_mv_banner_a_v01",
-    term: "",
   },
 };
 
@@ -830,9 +801,6 @@ function buildUrl() {
   params.set("utm_source", cleanValue(source.value));
   params.set("utm_medium", cleanValue(medium.value));
   params.set("utm_campaign", cleanValue(campaignName.value));
-  if (term.value.trim()) {
-    params.set("utm_term", cleanValue(term.value));
-  }
   params.set("utm_content", cleanValue(content.value));
 
   const joiner = base.includes("?") ? "&" : "?";
@@ -847,10 +815,6 @@ function buildExampleUrl(presetName) {
     utm_campaign: cleanValue(campaignName.value || "spring_enrollment_2026"),
     utm_content: preset.content,
   });
-
-  if (preset.term) {
-    params.set("utm_term", preset.term);
-  }
 
   return `${websiteUrl.value.trim()}?${params.toString()}`;
 }
@@ -875,7 +839,6 @@ function applyPreset(name) {
   source.value = preset.source;
   medium.value = preset.medium;
   content.value = preset.content;
-  term.value = preset.term;
   buildUrl();
   updateExamples();
 }
